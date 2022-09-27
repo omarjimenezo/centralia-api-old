@@ -5,6 +5,7 @@ const { Op } = require('sequelize');
 // const sendEmail = require('../_helpers/send-email');
 const db = require('../_helpers/db');
 const Role = require('../_helpers/role');
+const jwt = require('jsonwebtoken');
 
 module.exports = {
     authenticate,
@@ -23,22 +24,24 @@ module.exports = {
 };
 
 async function authenticate({ email, password }) {
-    const userInfo = await db.User.scope('withHash').findOne({ where: { email } });
+    const user = await db.User.scope('withHash').findOne({ where: { email } });
 
-    if (!userInfo || !(await bcrypt.compare(password, userInfo.passwordHash))) {
+    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
         throw 'Email or password is incorrect';
     }
-    
-    const user = {
-        id: userInfo.id,
-        email: userInfo.email,
-        nombre: userInfo.nombre,
-        apellido: userInfo.apellido,
-        rol: userInfo.rol,
-        avatar: userInfo.avatar,
-    }
-    
-    return user;
+
+    // create a jwt token that is valid for 7 days
+    const token = jwt.sign({ sub: user.id }, config.secret, { expiresIn: '7d' });
+
+    return {
+        ...omitPassword(user),
+        token
+    };
+}
+
+async function getAll() {
+    const users = await db.User.findAll();
+    return users.map(u => omitPassword(u));
 }
 
 async function refreshToken({ token, ipAddress }) {
@@ -147,8 +150,7 @@ async function resetPassword({ token, password }) {
 }
 
 async function getAll() {
-    const accounts = await db.Account.findAll();
-    return accounts.map(x => basicDetails(x));
+    return users.map(u => omitPassword(u));
 }
 
 async function getById(id) {
@@ -296,4 +298,18 @@ async function sendPasswordResetEmail(account, origin) {
         html: `<h4>Reset Password Email</h4>
                ${message}`
     });
+}
+
+// helper functions
+
+function omitPassword(userInfo) {
+    const userWithoutPassword = {
+        id: userInfo.id,
+        email: userInfo.email,
+        nombre: userInfo.nombre,
+        apellido: userInfo.apellido,
+        rol: userInfo.rol,
+        avatar: userInfo.avatar,
+    }
+    return userWithoutPassword;
 }

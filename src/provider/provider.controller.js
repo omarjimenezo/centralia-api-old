@@ -1,8 +1,7 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const Joi = require('joi');
-const Role = require('../_helpers/role');
-const userService = require('./user.service');
+const providerService = require('./provider.service');
 const validateRequest = require('../_middleware/validate-request');
 
 router.get('/', getAll);
@@ -16,55 +15,61 @@ module.exports = router;
 // route functions
 
 function getAll(req, res, next) {
-    userService.getAll()
-        .then((users) => res.json(users))
+    providerService.getAll()
+        .then((providers) => res.json(providers))
         .catch(next);
 }
 
 function getById(req, res, next) {
-    userService.getById(req.params.id)
-        .then((user) => res.json(user))
+    providerService.getById(req.params.id)
+        .then((provider) => res.json(provider))
         .catch(next);
 }
 
 function create(req, res, next) {
-    userService.create(req.body)
+    providerService.create(req.body)
         .then(() => res.json({ code: 0, message: 'success' }))
         .catch(next);
 }
 
 function update(req, res, next) {
-    userService.update(req.params.id, req.body)
+    providerService.update(req.params.id, req.body)
         .then(() => res.json({ code: 0, message: 'success' }))
         .catch(next);
 }
 
 function _delete(req, res, next) {
-    userService.delete(req.params.id)
+    providerService.delete(req.params.id)
         .then(() => res.json({ code: 0, message: 'success' }))
         .catch(next);
 }
 
 function createSchema(req, res, next) {
     const schema = Joi.object({
+        usuarioId: Joi.number().required(),
         nombre: Joi.string().required(),
-        apellido: Joi.string().required(),
-        rol: Joi.number().valid(Role.Proveedor, Role.Negocio, Role.Agente).required(),
-        email: Joi.string().email().required(),
-        password: Joi.string().min(6).required(),
-        confirmPassword: Joi.string().valid(Joi.ref('password')).required()
+        calle: Joi.string().required(),
+        numero: Joi.number().required(),
+        interior: Joi.string().optional(),
+        colonia: Joi.string().required(),
+        local: Joi.string().required(),
+        codigoPostal: Joi.number().min(5).required(),
+        logo: Joi.string().optional(),
     });
     validateRequest(req, next, schema);
 }
 
 function updateSchema(req, res, next) {
-    const schema = Joi.object({
+     const schema = Joi.object({
+        usuarioId: Joi.number().empty(0),
         nombre: Joi.string().empty(''),
-        apellido: Joi.string().empty(''),
-        rol: Joi.number().valid(Role.Proveedor, Role.Negocio, Role.Agente).empty(''),
-        email: Joi.string().email().empty(''),
-        password: Joi.string().min(6).empty(''),
-        confirmPassword: Joi.string().valid(Joi.ref('password')).empty('')
-    }).with('password', 'confirmPassword');
+        calle: Joi.string().empty(''),
+        numero: Joi.number().empty(0),
+        interior: Joi.string().empty(''),
+        colonia: Joi.string().empty(''),
+        local: Joi.string().empty(''),
+        codigoPostal: Joi.number().empty(0),
+        logo: Joi.string().empty(''),
+    });
     validateRequest(req, next, schema);
 }
