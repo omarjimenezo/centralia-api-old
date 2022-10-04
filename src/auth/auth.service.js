@@ -302,14 +302,16 @@ async function sendPasswordResetEmail(account, origin) {
 
 // helper functions
 
-function omitPassword(userInfo) {
+function omitPassword(user) {
     const userWithoutPassword = {
-        id: userInfo.id,
-        email: userInfo.email,
-        nombre: userInfo.nombre,
-        apellido: userInfo.apellido,
-        rol: userInfo.rol,
-        avatar: userInfo.avatar,
+        user: {
+            id: user.id,
+            email: user.email,
+            nombre: user.nombre,
+            apellido: user.apellido,
+            rol: user.rol,
+            avatar: user.avatar,
+        }
     }
     return userWithoutPassword;
 }

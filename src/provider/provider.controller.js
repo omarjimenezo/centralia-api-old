@@ -16,13 +16,13 @@ module.exports = router;
 
 function getAll(req, res, next) {
     providerService.getAll()
-        .then((providers) => res.json(providers))
+        .then((providers) => res.json({ code: 0, message: 'success', data: providers }))
         .catch(next);
 }
 
 function getById(req, res, next) {
     providerService.getById(req.params.id)
-        .then((provider) => res.json(provider))
+        .then((provider) => res.json({ code: 0, message: 'success', data: provider }))
         .catch(next);
 }
 
@@ -46,6 +46,7 @@ function _delete(req, res, next) {
 
 function createSchema(req, res, next) {
     const schema = Joi.object({
+        tipo: Joi.number().required(),
         usuarioId: Joi.number().required(),
         nombre: Joi.string().required(),
         calle: Joi.string().required(),
@@ -53,6 +54,7 @@ function createSchema(req, res, next) {
         interior: Joi.string().optional(),
         colonia: Joi.string().required(),
         local: Joi.string().required(),
+        telefono: Joi.number().optional(),
         codigoPostal: Joi.number().min(5).required(),
         logo: Joi.string().optional(),
     });
@@ -61,6 +63,7 @@ function createSchema(req, res, next) {
 
 function updateSchema(req, res, next) {
      const schema = Joi.object({
+        tipo: Joi.number().empty(0),
         usuarioId: Joi.number().empty(0),
         nombre: Joi.string().empty(''),
         calle: Joi.string().empty(''),
@@ -68,6 +71,7 @@ function updateSchema(req, res, next) {
         interior: Joi.string().empty(''),
         colonia: Joi.string().empty(''),
         local: Joi.string().empty(''),
+        telefono: Joi.number().empty(0),
         codigoPostal: Joi.number().empty(0),
         logo: Joi.string().empty(''),
     });

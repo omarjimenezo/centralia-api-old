@@ -8,6 +8,7 @@ function model(sequelize) {
         passwordHash: { type: DataTypes.STRING, allowNull: false },
         nombre: { type: DataTypes.STRING, allowNull: false },
         apellido: { type: DataTypes.STRING, allowNull: false },
+        telefono: { type: DataTypes.INTEGER, allowNull: true },
         rol: { type: DataTypes.INTEGER, allowNull: false },
         avatar: { type: DataTypes.STRING, allowNull: true }
     };

@@ -25,8 +25,8 @@ module.exports = router;
 
 function authenticate(req, res, next) {
     authService.authenticate(req.body)
-        .then(user => res.json(user))
-        .catch(next);
+        .then((user) => res.json({ code: 0, message: 'success', data: user }))
+        .catch((next, err) => res.json({ code: 1, message: err }));
 }
 
 function refreshToken(req, res, next) {
